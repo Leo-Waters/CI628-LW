@@ -1,6 +1,9 @@
 #include "SDL_net.h"
+#include "SDL_image.h"
 
 #include "MyGame.h"
+#include "TextureManager.h"
+#include "NetworkCommand.h"
 
 using namespace std;
 
@@ -24,27 +27,57 @@ static int on_receive(void* socket_ptr) {
         received = SDLNet_TCP_Recv(socket, message, message_length);
         message[received] = '\0';
 
-        char* pch = strtok(message, ",");
+        string log=string(message);
+        //DEBUG("DataIncome"+ log)
 
-        // get the command, which is the first string in the message
-        string cmd(pch);
 
-        // then get the arguments to the command
-        vector<string> args;
+        //find Multiple Commands in 1 Message
+        vector<NetworkCommand> Commands= vector<NetworkCommand>();
+        string CurrentCommand="";
+        string CurrentArg = "";
+        vector<string> CurrentArgs = vector<string>();
+        bool GotCommand = false;
+        for (size_t i = 0; i < received; i++)
+        {
+            if (message[i] == '|') {
 
-        while (pch != NULL) {
-            pch = strtok(NULL, ",");
-
-            if (pch != NULL) {
-                args.push_back(string(pch));
+                Commands.push_back(NetworkCommand(CurrentCommand, CurrentArgs));
+                CurrentCommand = "";
+                CurrentArgs.clear();
+                GotCommand = false;
+            }
+            else {
+                if (GotCommand == false) {
+                    if (message[i] == ',') {
+                        GotCommand = true;
+                    }
+                    else {
+                        CurrentCommand.push_back(message[i]);
+                    }
+                    
+                }
+                else if (message[i] == ',') {
+                    CurrentArgs.push_back(CurrentArg);
+                    CurrentArg.clear();
+                }
+                else {
+                    CurrentArg.push_back(message[i]);
+                }
+                
             }
         }
 
-        game->on_receive(cmd, args);
+        for each (auto item in Commands)
+        {
+            
+            game->on_receive(item.Command, item.Args);
 
-        if (cmd == "exit") {
-            break;
+            if (item.Command == "exit") {
+                break;
+            }
         }
+
+       
 
     } while (received > 0 && is_running);
 
@@ -132,6 +165,10 @@ int run_game() {
         return -1;
     }
 
+    TextureManager::Init("Textures/", renderer);
+
+    game->Init();
+
     loop(renderer);
 
     return 0;
@@ -151,12 +188,19 @@ int main(int argc, char** argv) {
         exit(2);
     }
 
+    if (!(IMG_Init(IMG_INIT_PNG)))
+    {
+        std::cout << "Img_Init FAILED TO INIT ERROR: " << IMG_GetError() << std::endl;
+        exit(3);
+    }
+
+    
     IPaddress ip;
 
     // Resolve host (ip name + port) into an IPaddress type
     if (SDLNet_ResolveHost(&ip, IP_NAME, PORT) == -1) {
         printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
-        exit(3);
+        exit(4);
     }
 
     // Open the connection to the server
@@ -164,7 +208,7 @@ int main(int argc, char** argv) {
 
     if (!socket) {
         printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
-        exit(4);
+        exit(5);
     }
 
     SDL_CreateThread(on_receive, "ConnectionReceiveThread", (void*)socket);
@@ -172,7 +216,11 @@ int main(int argc, char** argv) {
 
     run_game();
 
+    game->Dispose();
     delete game;
+
+    //clean up textures
+    TextureManager::Dispose();
 
     // Close connection to the server
     SDLNet_TCP_Close(socket);
@@ -182,6 +230,8 @@ int main(int argc, char** argv) {
 
     // Shutdown SDL
     SDL_Quit();
+
+
 
     return 0;
 }

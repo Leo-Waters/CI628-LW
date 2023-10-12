@@ -7,6 +7,8 @@
 
 #include "SDL.h"
 
+#include "player.h"
+
 static struct GameData {
     int player1Y = 0;
     int player2Y = 0;
@@ -17,12 +19,17 @@ static struct GameData {
 class MyGame {
 
     private:
+        Player* Players[4];
+
         SDL_Rect player1 = { 200, 0, 20, 60 };
         SDL_Rect player2 = { 600, 0, 20, 60 };
         SDL_Rect Ball = { 0, 0, 20, 20 };
 
     public:
         std::vector<std::string> messages;
+        bool Initalized = false;
+        void Init();
+        void Dispose();
 
         void on_receive(std::string message, std::vector<std::string>& args);
         void send(std::string message);
