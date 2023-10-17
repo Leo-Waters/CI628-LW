@@ -19,6 +19,7 @@ static struct GameData {
 class MyGame {
 
     private:
+        int PlayerID = -1;
         Player* Players[4];
 
         SDL_Rect player1 = { 200, 0, 20, 60 };

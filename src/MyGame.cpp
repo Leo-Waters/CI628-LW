@@ -36,7 +36,7 @@ void MyGame::on_receive(std::string cmd, std::vector<std::string>& args) {
             std::cout << "Unsure data Received: " << cmd;
             for each (auto var in args)
             {
-                std::cout << ",var";
+                std::cout << ","<<var;
 
             }
             std::cout << std::endl;
@@ -51,10 +51,16 @@ void MyGame::send(std::string message) {
 void MyGame::input(SDL_Event& event) {
     switch (event.key.keysym.sym) {
         case SDLK_w:
-            send(event.type == SDL_KEYDOWN ? "I_DOWN" : "I_UP");
+            send("KEY,"+ std::to_string(PlayerID) +"," + std::string(event.type == SDL_KEYDOWN ? "W_DOWN|" : "W_UP|"));
             break;
         case SDLK_s:
-            send(event.type == SDL_KEYDOWN ? "K_DOWN" : "K_UP");
+            send("KEY," + std::to_string(PlayerID) + "," + std::string(event.type == SDL_KEYDOWN ? "S_DOWN|" : "S_UP|"));
+            break;
+        case SDLK_a:
+            ("KEY," + std::to_string(PlayerID) + "," + std::string(event.type == SDL_KEYDOWN ? "A_DOWN|" : "A_UP|"));
+            break;
+        case SDLK_d:
+            ("KEY," + std::to_string(PlayerID) + "," + std::string(event.type == SDL_KEYDOWN ? "D_DOWN|" : "D_UP|"));
             break;
 
     }

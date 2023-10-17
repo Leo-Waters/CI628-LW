@@ -89,10 +89,10 @@ static int on_send(void* socket_ptr) {
 
     while (is_running) {
         if (game->messages.size() > 0) {
-            string message = "CLIENT_DATA";
+            string message = "";
 
             for (auto m : game->messages) {
-                message += "," + m;
+                message +=m;
             }
 
             game->messages.clear();

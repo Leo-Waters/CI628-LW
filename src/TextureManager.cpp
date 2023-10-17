@@ -11,6 +11,11 @@ void TextureManager::Init(const char* TexturesFolder, SDL_Renderer* _renderer)
 
     string path = TexturesFolder;
 
+    //creates directory if it dosnt exist, aids debugging if solution hasnt been setup properly
+    if(std::filesystem::is_directory(TexturesFolder)==false){
+        std::filesystem::create_directory(TexturesFolder);
+    }
+
     for (const auto& file : directory_iterator(path)) {//iterates trhough files in directory
         if (file.path().extension() == ".png" || file.path().extension() == ".PNG") {
             string filepath(file.path().u8string());

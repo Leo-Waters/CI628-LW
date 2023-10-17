@@ -1,5 +1,7 @@
 #include "Player.h"
 #include "Macros.h"
+
+
 Player::Player(int _ID, int _X, int _Y) : ID(_ID), Position(new SDL_Rect{ _X,_Y,40,40 })
 {
 	DEBUG("Created Player with ID: " << _ID << " at pos x" << _X << " y" << _Y);
