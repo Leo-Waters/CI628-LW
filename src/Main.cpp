@@ -5,6 +5,8 @@
 #include "TextureManager.h"
 #include "NetworkCommand.h"
 
+#include "Constants.h"
+
 using namespace std;
 
 const char* IP_NAME = "localhost";
@@ -69,7 +71,7 @@ static int on_receive(void* socket_ptr) {
 
         for each (auto item in Commands)
         {
-            
+            //DEBUG(item.Command<<" :"<<item.Args.size())
             game->on_receive(item.Command, item.Args);
 
             if (item.Command == "exit") {
@@ -97,7 +99,7 @@ static int on_send(void* socket_ptr) {
 
             game->messages.clear();
 
-            cout << "Sending_TCP: " << message << endl;
+            //cout << "Sending_TCP: " << message << endl;
 
             SDLNet_TCP_Send(socket, message.c_str(), message.length());
         }
@@ -114,7 +116,7 @@ void loop(SDL_Renderer* renderer) {
     while (is_running) {
         // input
         while (SDL_PollEvent(&event)) {
-            if ((event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) && event.key.repeat == 0) {
+            if ((event.type == SDL_KEYDOWN || event.type == SDL_MOUSEBUTTONDOWN|| event.type == SDL_MOUSEBUTTONUP || event.type == SDL_KEYUP) && event.key.repeat == 0) {
                 game->input(event);
 
                 switch (event.key.keysym.sym) {
@@ -147,9 +149,9 @@ void loop(SDL_Renderer* renderer) {
 
 int run_game() {
     SDL_Window* window = SDL_CreateWindow(
-        "Multiplayer Pong Client",
+        "Dungen Crawler",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        800, 600,
+        WindowWidth, WindowHeight,
         SDL_WINDOW_SHOWN
     );
 

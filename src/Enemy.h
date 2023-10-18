@@ -6,12 +6,12 @@
 #include "Macros.h"
 #include "Camera.h"
 
-class Player
+class Enemy
 {
 public:
 	SDL_Texture* PlayerTexture;
-	Player(int _ID, int _X, int _Y);
-	~Player();
+	Enemy(int _ID, int _X, int _Y);
+	~Enemy();
 	
 	void NetworkUpdate(std::vector<std::string>& args);
 	void Render(SDL_Renderer* renderer);
@@ -19,8 +19,6 @@ public:
 	int GetPosX();
 	int GetPosY();
 	int ID;
-	bool HasOwner = false;
-	bool IsLocalPlayer = false;
 private:
 	int X, Y;
 	SDL_Rect* RenderPosition;

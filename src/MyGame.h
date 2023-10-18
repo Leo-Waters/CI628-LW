@@ -6,15 +6,17 @@
 #include <string>
 
 #include "SDL.h"
-
+#include "Constants.h"
 #include "player.h"
-
+#include "Enemy.h"
+#include "Level.h"
 class MyGame {
 
     private:
-        int PlayerID = -1;
         Player* Players[4];
-
+        Enemy* Enemys[MaxEnemyCount];
+        Level* level;
+        int LocalPlayerID = -1;
     public:
         std::vector<std::string> messages;
         bool Initalized = false;

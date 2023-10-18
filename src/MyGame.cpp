@@ -6,6 +6,26 @@ void MyGame::Init()
     Players[1] = new Player(1, 100, 100);
     Players[2] = new Player(2, 100, 300);
     Players[3] = new Player(3, 100, 400);
+
+    for (int i = 0; i < MaxEnemyCount; i++)
+    {
+        Enemys[i] = new Enemy(i, -1000, -1000);
+    }
+
+
+    if (LocalPlayerID != -1) {
+        Players[LocalPlayerID]->IsLocalPlayer = true;
+    }
+
+    level = new Level(Level1[0], 40, 40, TileSize);
+
+    Camera::Min_x = 0;
+    Camera::Min_y = 0;
+
+    Camera::Max_x = (40 * TileSize) - WindowWidth;
+    Camera::Max_y = (40 * TileSize) - WindowHeight;
+    
+
     Initalized = true;
 }
 
@@ -15,9 +35,38 @@ void MyGame::Dispose()
     {
         delete Players[i];
     }
+
+    for (size_t i = 0; i < MaxEnemyCount; i++)
+    {
+        delete Enemys[i];
+    }
 }
 
 void MyGame::on_receive(std::string cmd, std::vector<std::string>& args) {
+    if (cmd == "ID") {
+
+        // we should have exactly 1 arguments
+        if (args.size() == 1) {
+
+            int ID = stoi(args.at(0));
+            DEBUG("Got LocalPlayerID of: " << ID);
+            if (ID == -1) {
+                DEBUG("No Avalible players, this client is spectating until someone leaves");
+            }
+            else
+            {
+                LocalPlayerID = ID;
+                if (Initalized) {
+                    Players[ID]->IsLocalPlayer = true;
+                }
+            }
+        }
+        else
+        {
+            std::cout << "Didnt Recive ID correctly: " << args.size() << std::endl;
+        }
+    }
+
     if (Initalized) {
         if (cmd == "PLAYER_DATA") {
             
@@ -32,6 +81,20 @@ void MyGame::on_receive(std::string cmd, std::vector<std::string>& args) {
                 std::cout << "Didnt Recive All Player Data : " << args.size() << std::endl;
             }
         }
+        else if(cmd=="ENEMY_DATA")
+        {
+            // we should have exactly 4 arguments
+            if (args.size() == 3) {
+
+                int ID = stoi(args.at(0));
+                Enemys[ID]->NetworkUpdate(args);
+            }
+            else
+            {
+                std::cout << "Didnt Recive All Enemy Data : " << args.size() << std::endl;
+            }
+        }
+
         else {
             std::cout << "Unsure data Received: " << cmd;
             for each (auto var in args)
@@ -49,6 +112,10 @@ void MyGame::send(std::string message) {
 }
 
 void MyGame::input(SDL_Event& event) {
+
+    if (LocalPlayerID == -1) {
+        Camera::Update(event);
+    }
     switch (event.key.keysym.sym) {
         case SDLK_w:
             send("KEY,"+std::string(event.type == SDL_KEYDOWN ? "W_DOWN|" : "W_UP|"));
@@ -67,15 +134,24 @@ void MyGame::input(SDL_Event& event) {
 }
 
 void MyGame::update() {
+    if (LocalPlayerID != -1) {
 
+        Camera::x = Players[LocalPlayerID]->GetPosX() - WindowWidthOffset;
+        Camera::y = Players[LocalPlayerID]->GetPosY() - WindowHeightOffset;
+    }
 }
 
 void MyGame::render(SDL_Renderer* renderer) {
+    
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-
+    level->Draw(renderer);
     for (size_t i = 0; i < 4; i++)
     {
         Players[i]->Render(renderer);
+    }
+    for (size_t i = 0; i < MaxEnemyCount; i++)
+    {
+        Enemys[i]->Render(renderer);
     }
 }
