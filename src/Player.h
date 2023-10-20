@@ -19,6 +19,7 @@ public:
 	int GetPosX();
 	int GetPosY();
 	int ID;
+	float Health;
 	bool HasOwner = false;
 	bool IsLocalPlayer = false;
 private:

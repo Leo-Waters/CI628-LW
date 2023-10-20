@@ -10,6 +10,18 @@ const int WindowHeight = 600;
 const int WindowWidthOffset = WindowWidth/2;
 const int WindowHeightOffset = WindowHeight / 2;
 
-const int TileSize = 40;
+const int TileSize = 80;
 
 const int MaxEnemyCount = 40;
+
+enum Anchor {
+	topLeft = 0,
+	topCenter = 1,
+	topRight = 2,
+	midLeft = 3,
+	midCenter = 4,
+	midRight = 5,
+	bottomLeft = 6,
+	bottomCenter = 7,
+	bottomRight = 8
+};

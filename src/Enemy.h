@@ -19,6 +19,7 @@ public:
 	int GetPosX();
 	int GetPosY();
 	int ID;
+	float Health;
 private:
 	int X, Y;
 	SDL_Rect* RenderPosition;

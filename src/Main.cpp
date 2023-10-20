@@ -24,13 +24,27 @@ static int on_receive(void* socket_ptr) {
     char message[message_length];
     int received;
 
+
+    string OverFlow=string();
+
     // TODO: while(), rather than do
     do {
-        received = SDLNet_TCP_Recv(socket, message, message_length);
+        received = SDLNet_TCP_Recv(socket, message, message_length-1);
         message[received] = '\0';
 
-        string log=string(message);
-        //DEBUG("DataIncome"+ log)
+        //DEBUG("OVERLENG" << OverFlow.length());
+        //how big is the data with overflow
+        int DataAmount = received + OverFlow.length();
+
+        //create string with both old and new data joined together
+        string receivedWithOverFlow(OverFlow);
+
+        for (size_t i = 0; i < received; i++)
+        {
+            receivedWithOverFlow += message[i];
+        }
+
+        //DEBUG("DataIncome"+ receivedWithOverFlow)
 
 
         //find Multiple Commands in 1 Message
@@ -39,34 +53,39 @@ static int on_receive(void* socket_ptr) {
         string CurrentArg = "";
         vector<string> CurrentArgs = vector<string>();
         bool GotCommand = false;
-        for (size_t i = 0; i < received; i++)
+
+        
+        for (size_t i = 0; i < DataAmount; i++)
         {
-            if (message[i] == '|') {
+            if (receivedWithOverFlow[i] == '|') {//Reached end of command add to vector
 
                 Commands.push_back(NetworkCommand(CurrentCommand, CurrentArgs));
                 CurrentCommand = "";
                 CurrentArgs.clear();
                 GotCommand = false;
+                OverFlow.clear();
             }
-            else {
+            else {//reading letter by letter
                 if (GotCommand == false) {
-                    if (message[i] == ',') {
+                    if (receivedWithOverFlow[i] == ','){ //got first arg being the command name
                         GotCommand = true;
                     }
                     else {
-                        CurrentCommand.push_back(message[i]);
+                        CurrentCommand.push_back(receivedWithOverFlow[i]);//append letters until , is reached
                     }
                     
                 }
-                else if (message[i] == ',') {
-                    CurrentArgs.push_back(CurrentArg);
-                    CurrentArg.clear();
+                else if (receivedWithOverFlow[i] == ',') {//got arg
+                    CurrentArgs.push_back(CurrentArg);//add arg tp list
+                    CurrentArg.clear();//clear added
                 }
                 else {
-                    CurrentArg.push_back(message[i]);
+                    CurrentArg.push_back(receivedWithOverFlow[i]);//add chars
                 }
+                OverFlow.push_back(receivedWithOverFlow[i]);
                 
             }
+            
         }
 
         for each (auto item in Commands)
@@ -167,9 +186,11 @@ int run_game() {
         return -1;
     }
 
-    TextureManager::Init("Textures/", renderer);
+    TextureManager::Init("Assets/Textures/", renderer);
 
-    game->Init();
+    
+
+    game->Init(renderer);
 
     loop(renderer);
 
@@ -181,12 +202,19 @@ int main(int argc, char** argv) {
     // Initialize SDL
     if (SDL_Init(0) == -1) {
         printf("SDL_Init: %s\n", SDL_GetError());
+
         exit(1);
     }
 
     // Initialize SDL_net
     if (SDLNet_Init() == -1) {
         printf("SDLNet_Init: %s\n", SDLNet_GetError());
+        exit(2);
+    }
+
+    // Initialize TTF
+    if (TTF_Init() == -1) {
+        printf("TTF_Init: %s\n", TTF_GetError());
         exit(2);
     }
 

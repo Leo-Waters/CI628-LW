@@ -2,6 +2,8 @@
 #include "Camera.h"
 #include "TextureManager.h"
 #include "Constants.h"
+#include "Macros.h"
+#include "UI_Text.h"
 const int Level1[40][40] = {
     {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
     {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -49,15 +51,20 @@ const int Level1[40][40] = {
 class  Level
 {
 public:
-     Level(const int* _leveldata,int _width,int _height,int _tilesize);
+     Level();
+
+     void Init();
+     void LevelUpdate(string cmd,std::vector<std::string>& args);
 
      void Draw(SDL_Renderer* renderer);
 
     ~ Level();
-
+    string CurrentLevel;
 private:
-    const int* leveldata;
-    int width, height, tilesize;
+    bool HasRecivedMapData=false;
+    
+    int* leveldata=nullptr;
+    int width, height;
     SDL_Texture* Wall;
     SDL_Texture* Floor;
     SDL_Rect BackgroundRect = SDL_Rect{ 0,0,WindowWidth,WindowHeight };
