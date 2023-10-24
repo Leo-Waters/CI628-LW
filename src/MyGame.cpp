@@ -43,6 +43,9 @@ void MyGame::Init(SDL_Renderer* renderer)
     PlayGUI->Text->push_back(UI_Text(Anchor::topLeft, 150, 50, 40, "CurrentLevel:", SDL_Color{ 255,255,255 }, renderer));
     LevelTxt = &PlayGUI->Text->at(0);
 
+    PlayGUI->Imgs->push_back(Image(Anchor::bottomLeft, 100, -140, 150, 150, "FireSpell_Icon.png"));
+    PlayGUI->Imgs->push_back(Image(Anchor::bottomRight, -100, -140, 150, 150, "IceSpell_icon.png"));
+
     //PlayGUI->Text->push_back(UI_Text(Anchor::bottomLeft, 300, -25, 20, "", SDL_Color{ 255,255,255 }, renderer));
    //auto HealthBar = &PlayGUI->Text->at(0);
     //auto HealthBar = &PlayGUI->Text->at(1);
@@ -162,6 +165,17 @@ void MyGame::input(SDL_Event& event) {
         case SDLK_d:
             send("KEY," + std::string(event.type == SDL_KEYDOWN ? "D_DOWN|" : "D_UP|"));
             break;
+        case SDLK_e:
+            if (event.type == SDL_KEYDOWN) {
+                send("KEY,CAST_ICE|");
+            }
+            break;
+        case SDLK_q:
+            if (event.type == SDL_KEYDOWN) {
+                send("KEY,CAST_FIRE|");
+            }
+            break;
+        
 
     }
 }
