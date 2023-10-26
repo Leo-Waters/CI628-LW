@@ -14,6 +14,8 @@ const int TileSize = 80;
 
 const int MaxEnemyCount = 40;
 
+const int MaxSpellCount = 20;
+
 enum Anchor {
 	topLeft = 0,
 	topCenter = 1,

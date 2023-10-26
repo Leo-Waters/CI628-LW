@@ -23,13 +23,47 @@ void Player::NetworkUpdate(std::vector<std::string>& args)
 	HasOwner = args.at(3) != "IDLE";
 	
 	Health = stof(args.at(4));
+	angle = stof(args.at(5));
+	Kills = stoi(args.at(6));
 }
 
 void Player::Render(SDL_Renderer* renderer)
 {
-	RenderPosition->x = X - Camera::x;
-	RenderPosition->y = Y - Camera::y;
-	SDL_RenderCopy(renderer, PlayerTexture, NULL, RenderPosition);
+	if (!IsDead()) {
+		RenderPosition->x = X - Camera::x;
+		RenderPosition->y = Y - Camera::y;
+		SDL_RenderCopyEx(renderer, PlayerTexture, NULL, RenderPosition, angle, NULL, SDL_FLIP_NONE);
+	}
+	
+}
+
+string Player::GetState()
+{
+
+	string state = "";
+
+	if (HasOwner) {
+		if (IsLocalPlayer) {
+			state = "Your Player";
+		}else{
+			state = "Other Player";
+		}
+	}
+	else
+	{
+		state = "Idle Player";
+	}
+
+	if (Health <= 0) {
+		state += " | Is Dead";
+	}
+	else {
+		state += " | Is Alive, Health:" + std::to_string((int)Health);
+	}
+
+	state += " | KILLS : " + std::to_string(Kills) + " | ";
+
+	return state;
 }
 
 int Player::GetPosX()
@@ -40,4 +74,14 @@ int Player::GetPosX()
 int Player::GetPosY()
 {
 	return  int(Y);
+}
+
+float Player::GetAngle()
+{
+	return angle;
+}
+
+bool Player::IsDead()
+{
+	return Health<=0;
 }

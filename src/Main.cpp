@@ -132,7 +132,12 @@ static int on_send(void* socket_ptr) {
 void loop(SDL_Renderer* renderer) {
     SDL_Event event;
 
+
+    Uint64 CurrentTime = SDL_GetPerformanceCounter();
+    Uint64 LastTime = 0;
+   
     while (is_running) {
+
         // input
         while (SDL_PollEvent(&event)) {
             if ((event.type == SDL_KEYDOWN || event.type == SDL_MOUSEBUTTONDOWN|| event.type == SDL_MOUSEBUTTONUP || event.type == SDL_KEYUP) && event.key.repeat == 0) {
@@ -153,10 +158,13 @@ void loop(SDL_Renderer* renderer) {
             }
         }
 
+        LastTime = CurrentTime;
+        CurrentTime = SDL_GetPerformanceCounter();
+
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        game->update();
+        game->update(((CurrentTime - LastTime) * 1000 / (double)SDL_GetPerformanceFrequency()));
 
         game->render(renderer);
 

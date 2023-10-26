@@ -12,14 +12,17 @@ public:
 	SDL_Texture* SpellTextureFire;
 	SDL_Texture* SpellTextureIce;
 	bool Type = true;
+	bool Active = false;
 	Spell(int _X, int _Y);
 	~Spell();
 	
-	void NetworkUpdate(std::vector<std::string>& args);
+	void Update(float tpf);
+	void NetworkUpdate(string cmd, std::vector<std::string>& args);
 	void Render(SDL_Renderer* renderer);
 
 private:
-	int X, Y;
+	float X, Y;
+	float vX, vY;
 	SDL_Rect* RenderPosition;
 };
 

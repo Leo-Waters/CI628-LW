@@ -16,14 +16,20 @@ public:
 	void NetworkUpdate(std::vector<std::string>& args);
 	void Render(SDL_Renderer* renderer);
 
+	string GetState();
+
 	int GetPosX();
 	int GetPosY();
-	int ID;
-	float Health;
+	float GetAngle();
+	int ID=-1;
+	float Health=0;
+	int Kills=0;
 	bool HasOwner = false;
 	bool IsLocalPlayer = false;
+	bool IsDead();
 private:
 	int X, Y;
+	float angle;
 	SDL_Rect* RenderPosition;
 };
 
