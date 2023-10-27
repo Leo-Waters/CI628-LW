@@ -16,6 +16,10 @@ const int MaxEnemyCount = 40;
 
 const int MaxSpellCount = 20;
 
+const int TILE_WALL  = 1;
+const int TILE_SPAWN = 5;
+const int TILE_HATCH = 6;
+
 enum Anchor {
 	topLeft = 0,
 	topCenter = 1,

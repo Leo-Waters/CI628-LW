@@ -322,7 +322,7 @@ void MyGame::update(float tpf) {
 
         float Angle = (atan2(-Delta_x, Delta_y) * 180.0000) / 3.14159265;
 
-        if (std::abs(Angle - Players[LocalPlayerID]->GetAngle())>1) {//send threash hold to reduce angle updates
+        if (std::abs(Angle - Players[LocalPlayerID]->GetAngle())>2.5) {//send threash hold to reduce angle updates
             send("ANGLE," + std::to_string(Angle) + ",|");
         }
 

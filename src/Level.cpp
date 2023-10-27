@@ -10,6 +10,8 @@ void Level::Init()
 {
 	Wall = TextureManager::GetTexture("wall.png");
 	Floor = TextureManager::GetTexture("floor.png");
+	Spawn = TextureManager::GetTexture("enemy_spawn.png");
+	Hatch = TextureManager::GetTexture("hatch.png");
 }
 
 void Level::LevelUpdate(string cmd,std::vector<std::string>& args)
@@ -18,10 +20,7 @@ void Level::LevelUpdate(string cmd,std::vector<std::string>& args)
 
 		//clean up old level data from memory
 		if (leveldata != nullptr) {
-			for (size_t i = 0; i < width*height; i++)
-			{
-				delete &leveldata[i];
-			}
+			delete[] leveldata;
 			leveldata = nullptr;
 		}
 		HasRecivedMapData = false;
@@ -68,8 +67,17 @@ void Level::Draw(SDL_Renderer* renderer)
 			for (int y = 0; y < height; y++)
 			{
 				SDL_Rect pos = SDL_Rect({ (x * TileSize) - Camera::x, (y * TileSize) - Camera::y, TileSize, TileSize });
-				if (leveldata[y * width + x] == 1) {
+
+				int tiletype = leveldata[y * width + x];
+
+				if (tiletype == TILE_WALL) {
 					SDL_RenderCopy(renderer, Wall, NULL, &pos);
+				}
+				else if (tiletype == TILE_SPAWN) {
+					SDL_RenderCopy(renderer, Spawn, NULL, &pos);
+				}
+				else if (tiletype == TILE_HATCH) {
+					SDL_RenderCopy(renderer, Hatch, NULL, &pos);
 				}
 				else{
 					SDL_RenderCopy(renderer, Floor, NULL, &pos);
