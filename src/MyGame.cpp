@@ -158,6 +158,10 @@ void MyGame::on_receive(std::string cmd, std::vector<std::string>& args) {
         if (args.size() == 1) {
 
             int ID = stoi(args.at(0));
+
+            if (LocalPlayerID != -1&&ID!=-1) {
+                Players[LocalPlayerID]->IsLocalPlayer = false;
+            }
             DEBUG("Got LocalPlayerID of: " << ID);
             if (ID == -1) {
                 DEBUG("No Avalible players, this client is spectating until someone leaves");
