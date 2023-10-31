@@ -72,7 +72,7 @@ static int on_receive(void* socket_ptr) {
             
             for each (auto item in Commands)
             {
-                DEBUG(item->Command<<" :"<<std::to_string(item->Args.size()))
+                //DEBUG(item->Command<<" :"<<std::to_string(item->Args.size()))
                 game->on_receive(item->Command, item->Args);
 
                 if (item->Command == "exit") {
