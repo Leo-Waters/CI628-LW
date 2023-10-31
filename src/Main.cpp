@@ -4,7 +4,7 @@
 #include "MyGame.h"
 #include "TextureManager.h"
 #include "NetworkCommand.h"
-
+#include "Compression.h"
 #include "Constants.h"
 
 using namespace std;
@@ -25,78 +25,73 @@ static int on_receive(void* socket_ptr) {
     int received;
 
 
-    string OverFlow=string();
+    string CurrentMessage = "";
+    string PreviousMessageOverflow = "";
 
     // TODO: while(), rather than do
     do {
         received = SDLNet_TCP_Recv(socket, message, message_length-1);
         message[received] = '\0';
 
-        //DEBUG("OVERLENG" << OverFlow.length());
-        //how big is the data with overflow
-        int DataAmount = received + OverFlow.length();
 
-        //create string with both old and new data joined together
-        string receivedWithOverFlow(OverFlow);
+        int DataAmount = PreviousMessageOverflow.length() + received;
+        string receivedWithOverFlow(PreviousMessageOverflow);
 
         for (size_t i = 0; i < received; i++)
         {
             receivedWithOverFlow += message[i];
         }
 
-        //DEBUG("DataIncome"+ receivedWithOverFlow)
-
-
-        //find Multiple Commands in 1 Message
-        vector<NetworkCommand> Commands= vector<NetworkCommand>();
-        string CurrentCommand="";
-        string CurrentArg = "";
-        vector<string> CurrentArgs = vector<string>();
-        bool GotCommand = false;
-
-        
+        //DEBUG("\nPrev Overflow= "+ PreviousMessageOverflow+"\n")
+        //DEBUG("\Recived + Overflow= " + receivedWithOverFlow + "\n")
+        CurrentMessage = "";
+        bool GotCurrentMessage = false;
         for (size_t i = 0; i < DataAmount; i++)
         {
-            if (receivedWithOverFlow[i] == '|') {//Reached end of command add to vector
-
-                Commands.push_back(NetworkCommand(CurrentCommand, CurrentArgs));
-                CurrentCommand = "";
-                CurrentArgs.clear();
-                GotCommand = false;
-                OverFlow.clear();
+            if (receivedWithOverFlow[i] == '%') {//reached end of current message
+                GotCurrentMessage = true;
+                PreviousMessageOverflow = "";
             }
-            else {//reading letter by letter
-                if (GotCommand == false) {
-                    if (receivedWithOverFlow[i] == ','){ //got first arg being the command name
-                        GotCommand = true;
-                    }
-                    else {
-                        CurrentCommand.push_back(receivedWithOverFlow[i]);//append letters until , is reached
-                    }
-                    
-                }
-                else if (receivedWithOverFlow[i] == ',') {//got arg
-                    CurrentArgs.push_back(CurrentArg);//add arg tp list
-                    CurrentArg.clear();//clear added
-                }
-                else {
-                    CurrentArg.push_back(receivedWithOverFlow[i]);//add chars
-                }
-                OverFlow.push_back(receivedWithOverFlow[i]);
-                
+            else if(GotCurrentMessage)
+            {
+                //got message all next data is for the next message
+                PreviousMessageOverflow += receivedWithOverFlow[i];
+            }
+            else
+            {
+                //getting the current message
+                CurrentMessage += receivedWithOverFlow[i];
             }
             
         }
+        
+        //has got the full message
+        if (GotCurrentMessage) {
+            //DEBUG("Incoming" << CurrentMessage);
+            auto Commands=Compresion::Decompress(CurrentMessage);
+            
+            for each (auto item in Commands)
+            {
+                DEBUG(item->Command<<" :"<<std::to_string(item->Args.size()))
+                game->on_receive(item->Command, item->Args);
 
-        for each (auto item in Commands)
-        {
-            //DEBUG(item.Command<<" :"<<item.Args.size())
-            game->on_receive(item.Command, item.Args);
+                if (item->Command == "exit") {
+                    delete item;
+                    break;
+                }
+                else
+                {
+                    delete item;
+                }
 
-            if (item.Command == "exit") {
-                break;
             }
         }
+        else
+        {
+            //the whole read message is incomplete adding to overflow to be completed with next network data
+            PreviousMessageOverflow += CurrentMessage;
+        }
+
 
        
 
@@ -113,14 +108,17 @@ static int on_send(void* socket_ptr) {
             string message = "";
 
             for (auto m : game->messages) {
+                //DEBUG("mess "<<m);
                 message +=m;
             }
 
             game->messages.clear();
 
+            auto comp = Compresion::Compress(message);
+            //DEBUG("comp combined mess " << comp);
             //cout << "Sending_TCP: " << message << endl;
 
-            SDLNet_TCP_Send(socket, message.c_str(), message.length());
+            SDLNet_TCP_Send(socket, comp.c_str(), comp.length());
         }
 
         SDL_Delay(1);
@@ -206,6 +204,9 @@ int run_game() {
 }
 
 int main(int argc, char** argv) {
+
+    //test
+    Compresion::Test();
 
     // Initialize SDL
     if (SDL_Init(0) == -1) {

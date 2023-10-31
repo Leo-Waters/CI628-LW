@@ -233,7 +233,7 @@ void MyGame::on_receive(std::string cmd, std::vector<std::string>& args) {
             }
         }
         else {
-            std::cout << "Unsure data Received: " << cmd;
+            std::cout << "Unsure data Received or initalization data: " << cmd;
             for each (auto var in args)
             {
                 std::cout << "," << var;
@@ -254,7 +254,7 @@ void MyGame::input(SDL_Event& event) {
         switch (event.key.keysym.sym) {
         case SDLK_SPACE:
             if (event.type == SDL_KEYDOWN) {
-                send("ACTIVE_SPECTATOR|");//notif the server the spectator is active, this will asign them a new player ID if there is a IDLE player
+                send("ACTIVE_SPECTATOR,|");//notif the server the spectator is active, this will asign them a new player ID if there is a IDLE player
                 CycleSpectatorPlayer();
             }
             break;
@@ -268,25 +268,25 @@ void MyGame::input(SDL_Event& event) {
     }
     switch (event.key.keysym.sym) {
         case SDLK_w:
-            send("KEY,"+std::string(event.type == SDL_KEYDOWN ? "W_DOWN|" : "W_UP|"));
+            send("KEY,"+std::string(event.type == SDL_KEYDOWN ? "W_DOWN,|" : "W_UP,|"));
             break;
         case SDLK_s:
-            send("KEY," +std::string(event.type == SDL_KEYDOWN ? "S_DOWN|" : "S_UP|"));
+            send("KEY," +std::string(event.type == SDL_KEYDOWN ? "S_DOWN,|" : "S_UP,|"));
             break;
         case SDLK_a:
-            send("KEY," + std::string(event.type == SDL_KEYDOWN ? "A_DOWN|" : "A_UP|"));
+            send("KEY," + std::string(event.type == SDL_KEYDOWN ? "A_DOWN,|" : "A_UP,|"));
             break;
         case SDLK_d:
-            send("KEY," + std::string(event.type == SDL_KEYDOWN ? "D_DOWN|" : "D_UP|"));
+            send("KEY," + std::string(event.type == SDL_KEYDOWN ? "D_DOWN,|" : "D_UP,|"));
             break;
         case SDLK_e:
             if (event.type == SDL_KEYDOWN) {
-                send("KEY,CAST_ICE|");
+                send("KEY,CAST_ICE,|");
             }
             break;
         case SDLK_q:
             if (event.type == SDL_KEYDOWN) {
-                send("KEY,CAST_FIRE|");
+                send("KEY,CAST_FIRE,|");
             }
             break;
         case SDLK_TAB:

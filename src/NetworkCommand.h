@@ -4,6 +4,7 @@
 class NetworkCommand
 {
 public:
+	static std::vector<NetworkCommand*> GetCommands(std::string Data);
 	std::string Command;
 	std::vector<std::string> Args;
 
