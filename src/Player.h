@@ -13,7 +13,7 @@ public:
 	Player(int _ID, int _X, int _Y);
 	~Player();
 	
-	void NetworkUpdate(std::vector<std::string>& args);
+	void NetworkUpdate(std::string cmd,std::vector<std::string>& args);
 	void Render(SDL_Renderer* renderer);
 
 	string GetState();

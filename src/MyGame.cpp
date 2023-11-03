@@ -188,17 +188,17 @@ void MyGame::on_receive(std::string cmd, std::vector<std::string>& args) {
     }
 
     if (Initalized) {
-        if (cmd == "PLAYER_DATA") {
+        if (cmd == "PLAYER_DATA"|| cmd== "PLAYER_STAT" || cmd=="PLAYER_POS") {
             
             // we should have exactly 5 arguments
-            if (args.size() == 7) {
+            if (args.size() > 1) {
                 
                 int ID = stoi(args.at(0));
-                Players[ID]->NetworkUpdate(args);
+                Players[ID]->NetworkUpdate(cmd,args);
             }
             else
             {
-                std::cout << "Didnt Recive All Player Data : " << args.size() << std::endl;
+                std::cout << "Player data invalid" << args.size() << std::endl;
             }
         }
         else if (cmd == "ENEMY_DATA")

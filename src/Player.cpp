@@ -15,16 +15,34 @@ Player::~Player()
 
 
 
-void Player::NetworkUpdate(std::vector<std::string>& args)
+void Player::NetworkUpdate(std::string cmd,std::vector<std::string>& args)
 {
-	//DEBUG("Recived PLAYER"+ args.at(0)+"   X: " + args.at(1) + " Y: " + args.at(2) + " State: " + args.at(3));
-	X = stoi(args.at(1));
-	Y = stoi(args.at(2));
-	HasOwner = args.at(3) != "IDLE";
-	
-	Health = stof(args.at(4));
-	angle = stof(args.at(5));
-	Kills = stoi(args.at(6));
+	if (cmd == "PLAYER_DATA") {
+		//DEBUG("Recived PLAYER"+ args.at(0)+"   X: " + args.at(1) + " Y: " + args.at(2) + " State: " + args.at(3));
+		X = stoi(args.at(1));
+		Y = stoi(args.at(2));
+		HasOwner = args.at(3) != "IDLE";
+
+		Health = stof(args.at(4));
+		angle = stof(args.at(5));
+		Kills = stoi(args.at(6));
+	}
+	else if(cmd == "PLAYER_STAT")
+	{
+		HasOwner = args.at(1) != "IDLE";
+
+		Health = stof(args.at(2));
+		
+		Kills = stoi(args.at(3));
+	}
+	else if (cmd == "PLAYER_POS")
+	{
+		X = stoi(args.at(1));
+		Y = stoi(args.at(2));
+		angle = stof(args.at(3));
+	}
+
+
 }
 
 void Player::Render(SDL_Renderer* renderer)

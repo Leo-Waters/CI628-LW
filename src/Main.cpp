@@ -68,6 +68,9 @@ static int on_receive(void* socket_ptr) {
         //has got the full message
         if (GotCurrentMessage) {
             //DEBUG("Incoming" << CurrentMessage);
+
+           
+
             auto Commands=Compresion::Decompress(CurrentMessage);
             
             for each (auto item in Commands)
@@ -115,6 +118,7 @@ static int on_send(void* socket_ptr) {
             game->messages.clear();
 
             auto comp = Compresion::Compress(message);
+            comp += "%";
             //DEBUG("comp combined mess " << comp);
             //cout << "Sending_TCP: " << message << endl;
 
@@ -130,11 +134,21 @@ static int on_send(void* socket_ptr) {
 void loop(SDL_Renderer* renderer) {
     SDL_Event event;
 
+    const int FrameRateFPS = 60;
+    const int FrameDelay = 1000/ FrameRateFPS;
 
-    Uint64 CurrentTime = SDL_GetPerformanceCounter();
-    Uint64 LastTime = 0;
+    Uint32 FrameStart;
+
+   
+    int FrameCount = 0;
+    float FrameRateTime = 0;
+
+
+    Uint32 Ticks= SDL_GetTicks();
    
     while (is_running) {
+
+        FrameStart = SDL_GetTicks();
 
         // input
         while (SDL_PollEvent(&event)) {
@@ -156,19 +170,39 @@ void loop(SDL_Renderer* renderer) {
             }
         }
 
-        LastTime = CurrentTime;
-        CurrentTime = SDL_GetPerformanceCounter();
+          
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        game->update(((CurrentTime - LastTime) * 1000 / (double)SDL_GetPerformanceFrequency()));
+        float deltaTime = (SDL_GetTicks() - Ticks) / 1000.0f;
+
+        
+        game->update(deltaTime);
 
         game->render(renderer);
 
+        Ticks = SDL_GetTicks();
+        FrameCount++;
+        if (FrameRateTime >= 1) {
+            DEBUG("Current FPS: " << FrameCount);
+            FrameCount = 0;
+            FrameRateTime = 0;
+        }
+        else {
+            FrameRateTime += deltaTime;
+        }
+
+
+
         SDL_RenderPresent(renderer);
 
-        SDL_Delay(17);
+        int FrameTime = SDL_GetTicks() - FrameStart;
+
+        if (FrameDelay > FrameTime) {
+            SDL_Delay(FrameDelay - FrameTime);
+        }
+
     }
 }
 

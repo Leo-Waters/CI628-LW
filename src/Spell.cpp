@@ -19,8 +19,8 @@ Spell::~Spell()
 void Spell::Update(float tpf)
 {
 	if (Active) {
-		X += vX;
-		Y += vY;
+		X += vX* tpf;
+		Y += vY* tpf;
 		
 	}
 }
