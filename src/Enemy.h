@@ -9,7 +9,8 @@
 class Enemy
 {
 public:
-	SDL_Texture* PlayerTexture;
+	SDL_Texture* FireType;
+	SDL_Texture* IceType;
 	Enemy(int _ID, int _X, int _Y);
 	~Enemy();
 	
@@ -21,6 +22,7 @@ public:
 	int ID;
 	float Health;
 private:
+	bool IsFireType;
 	int X, Y;
 	SDL_Rect* RenderPosition;
 };

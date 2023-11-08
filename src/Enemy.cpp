@@ -5,7 +5,8 @@
 Enemy::Enemy(int _ID, int _X, int _Y) : ID(_ID),X(_X),Y(_Y), RenderPosition(new SDL_Rect{_X,_Y,30,30})
 {
 	//DEBUG("Created Player with ID: " << _ID << " at pos x" << _X << " y" << _Y);
-	PlayerTexture = TextureManager::GetTexture("Enemy.png");
+	FireType = TextureManager::GetTexture("Enemy.png");
+	IceType = TextureManager::GetTexture("Enemy2.png");
 }
 
 Enemy::~Enemy()
@@ -21,13 +22,21 @@ void Enemy::NetworkUpdate(std::vector<std::string>& args)
 	X = stoi(args.at(1));
 	Y = stoi(args.at(2));
 	Health = stof(args.at(3));
+	IsFireType = args.at(4) == "true";
 }
 
 void Enemy::Render(SDL_Renderer* renderer)
 {
 	RenderPosition->x = X - Camera::x;
 	RenderPosition->y = Y - Camera::y;
-	SDL_RenderCopy(renderer, PlayerTexture, NULL, RenderPosition);
+	if (IsFireType) {
+		SDL_RenderCopy(renderer, FireType, NULL, RenderPosition);
+	}
+	else
+	{
+		SDL_RenderCopy(renderer, IceType, NULL, RenderPosition);
+	}
+	
 }
 
 int Enemy::GetPosX()

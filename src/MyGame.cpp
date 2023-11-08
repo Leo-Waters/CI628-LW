@@ -179,6 +179,10 @@ void MyGame::on_receive(std::string cmd, std::vector<std::string>& args) {
             std::cout << "Didnt Recive ID correctly: " << args.size() << std::endl;
         }
     }
+    if (cmd == "HIGHSCORE") {
+        BestLevel = args.at(0);
+        BestKills = args.at(1);
+    }
 
     if (cmd == "LEVELUPDATE"|| cmd == "LEVELDATA"|| cmd=="LEVELUPDATECOMPLETE") {
         if (level == nullptr) {
@@ -204,14 +208,11 @@ void MyGame::on_receive(std::string cmd, std::vector<std::string>& args) {
         else if (cmd == "ENEMY_DATA")
         {
             // we should have exactly 4 arguments
-            if (args.size() == 4) {
+            if (args.size() == 5) {
 
                 if (args.size() > 0) {
                     int ID = stoi(args.at(0));
                     Enemys[ID]->NetworkUpdate(args);
-
-
-                    Spells[ID]->NetworkUpdate(cmd, args);
                 }
                 else
                 {
