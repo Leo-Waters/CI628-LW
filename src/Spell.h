@@ -5,7 +5,7 @@
 #include "TextureManager.h"
 #include "Macros.h"
 #include "Camera.h"
-
+#include "ParticleSystem.h"
 class Spell
 {
 public:
@@ -21,6 +21,7 @@ public:
 	void Render(SDL_Renderer* renderer);
 
 private:
+	ParticleSystem* particleSystem;
 	float X, Y;
 	float vX, vY;
 	SDL_Rect* RenderPosition;

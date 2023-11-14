@@ -7,11 +7,13 @@ Spell::Spell(int _X, int _Y) : X(_X),Y(_Y), RenderPosition(new SDL_Rect{_X,_Y,20
 	//DEBUG("Created Player with ID: " << _ID << " at pos x" << _X << " y" << _Y);
 	SpellTextureIce = TextureManager::GetTexture("IceSpell.png");
 	SpellTextureFire = TextureManager::GetTexture("FireSpell.png");
+	particleSystem = new ParticleSystem(10000,0.001f,3);
 }
 
 Spell::~Spell()
 {
 	delete RenderPosition;
+	delete particleSystem;
 }
 
 
@@ -23,6 +25,7 @@ void Spell::Update(float tpf)
 		Y += vY* tpf;
 		
 	}
+	particleSystem->Update(tpf, X, Y, vX, vY, Active);
 }
 
 void Spell::NetworkUpdate(string cmd, std::vector<std::string>& args)
@@ -46,7 +49,8 @@ void Spell::NetworkUpdate(string cmd, std::vector<std::string>& args)
 
 void Spell::Render(SDL_Renderer* renderer)
 {
-	if (Active) {
+	particleSystem->Render(renderer);
+	if (Active) {		
 		RenderPosition->x = X - Camera::x;
 		RenderPosition->y = Y - Camera::y;
 		if (Type) {
@@ -55,6 +59,7 @@ void Spell::Render(SDL_Renderer* renderer)
 		else
 		{
 			SDL_RenderCopy(renderer, SpellTextureIce, NULL, RenderPosition);
+
 		}
 	}
 	
