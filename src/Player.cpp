@@ -2,7 +2,7 @@
 #include "Macros.h"
 
 
-Player::Player(int _ID, int _X, int _Y) : ID(_ID),X(_X),Y(_Y), RenderPosition(new SDL_Rect{_X,_Y,40,40})
+Player::Player(int _ID, int _X, int _Y) : ID(_ID),X(_X),Y(_Y), LastX(_X), LastY(_Y), PredictedX(_X), PredictedY(_Y), RenderPosition(new SDL_Rect{_X,_Y,40,40})
 {
 	//DEBUG("Created Player with ID: " << _ID << " at pos x" << _X << " y" << _Y);
 	PlayerTexture = TextureManager::GetTexture("Player.png");
@@ -15,12 +15,33 @@ Player::~Player()
 
 
 
+void Player::PositionPrediction(int newX, int newY)
+{
+	LastX = X;
+	LastY = Y;
+
+	//to far position needs to  sync
+	if (abs(LastX - newX) > 200) {
+		LastX = newX;
+
+	}
+	if (abs(LastY - newY) > 200) {
+		LastY = newY;
+	}
+
+	PredictedX = newX + (newX - LastX);
+	PredictedY = newY + (newY - LastY);
+
+	LastMessageTime = SDL_GetTicks();
+}
+
 void Player::NetworkUpdate(std::string cmd,std::vector<std::string>& args)
 {
 	if (cmd == "PLAYER_DATA") {
 		//DEBUG("Recived PLAYER"+ args.at(0)+"   X: " + args.at(1) + " Y: " + args.at(2) + " State: " + args.at(3));
-		X = stoi(args.at(1));
-		Y = stoi(args.at(2));
+		PositionPrediction(stoi(args.at(1)), stoi(args.at(2)));
+
+		LastMessageTime = SDL_GetTicks();
 		HasOwner = args.at(3) != "IDLE";
 
 		Health = stof(args.at(4));
@@ -37,20 +58,49 @@ void Player::NetworkUpdate(std::string cmd,std::vector<std::string>& args)
 	}
 	else if (cmd == "PLAYER_POS")
 	{
-		X = stoi(args.at(1));
-		Y = stoi(args.at(2));
+		PositionPrediction(stoi(args.at(1)), stoi(args.at(2)));
+
 		angle = stof(args.at(3));
 	}
 
 
 }
+float Player::lerpClamped(float a, float b, float f)
+{
+	if (f > 1) {
+		f = 1;
+	}
+	if (f < 0) {
+		f = 0;
+	}
+
+	float lerp = a * (1.0 - f) + (b * f);
+	return lerp;
+}
 
 void Player::Render(SDL_Renderer* renderer)
 {
 	if (!IsDead()) {
+
+		double time = (SDL_GetTicks() - LastMessageTime) / 1000;
+
+		//DEBUG("TIME" << (time));
+
+		//DEBUG("Last" << LastX <<"Current"<< X << "Pred" << PredictedX);
+		//DEBUG("Last" << LastY << "Current" << Y << "Pred" << PredictedY);
+		X = lerpClamped(LastX, PredictedX, time);
+		Y = lerpClamped(LastY, PredictedY, time);
 		RenderPosition->x = X - Camera::x;
 		RenderPosition->y = Y - Camera::y;
+
 		SDL_RenderCopyEx(renderer, PlayerTexture, NULL, RenderPosition, angle, NULL, SDL_FLIP_NONE);
+
+
+
+
+
+
+
 	}
 	
 }

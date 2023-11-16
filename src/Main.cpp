@@ -26,6 +26,7 @@ static int on_receive(void* socket_ptr) {
 
 
     string CurrentMessage = "";
+    std::vector<string> Messages=std::vector<string>();
     string PreviousMessageOverflow = "";
 
     // TODO: while(), rather than do
@@ -45,17 +46,12 @@ static int on_receive(void* socket_ptr) {
         //DEBUG("\nPrev Overflow= "+ PreviousMessageOverflow+"\n")
         //DEBUG("\Recived + Overflow= " + receivedWithOverFlow + "\n")
         CurrentMessage = "";
-        bool GotCurrentMessage = false;
         for (size_t i = 0; i < DataAmount; i++)
         {
             if (receivedWithOverFlow[i] == '%') {//reached end of current message
-                GotCurrentMessage = true;
+                Messages.push_back(CurrentMessage);
                 PreviousMessageOverflow = "";
-            }
-            else if(GotCurrentMessage)
-            {
-                //got message all next data is for the next message
-                PreviousMessageOverflow += receivedWithOverFlow[i];
+                CurrentMessage = "";
             }
             else
             {
@@ -64,19 +60,18 @@ static int on_receive(void* socket_ptr) {
             }
             
         }
+        //append any overflow
+        PreviousMessageOverflow += CurrentMessage;
         
-        //has got the full message
-        if (GotCurrentMessage) {
-            //DEBUG("Incoming" << CurrentMessage);
+        //Itterate throuhh full messages
+        for each (string Message in Messages)
+        {
+            auto Commands = Compresion::Decompress(Message);
 
-           
-
-            auto Commands=Compresion::Decompress(CurrentMessage);
-            
             for each (auto item in Commands)
             {
-                //DEBUG(item->Command<<" :"<<std::to_string(item->Args.size()))
-                game->on_receive(item->Command, item->Args);
+                //DEBUG(item->Command << " :" << std::to_string(item->Args.size()))
+                    game->on_receive(item->Command, item->Args);
 
                 if (item->Command == "exit") {
                     delete item;
@@ -88,15 +83,8 @@ static int on_receive(void* socket_ptr) {
                 }
 
             }
-        }
-        else
-        {
-            //the whole read message is incomplete adding to overflow to be completed with next network data
-            PreviousMessageOverflow += CurrentMessage;
-        }
-
-
-       
+        }      
+        Messages.clear();
 
     } while (received > 0 && is_running);
 

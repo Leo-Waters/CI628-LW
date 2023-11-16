@@ -25,7 +25,7 @@ void Spell::Update(float tpf)
 		Y += vY* tpf;
 		
 	}
-	particleSystem->Update(tpf, X, Y, vX, vY, Active);
+	particleSystem->Update(tpf, X+10, Y+10, vX, vY, Active);
 }
 
 void Spell::NetworkUpdate(string cmd, std::vector<std::string>& args)
@@ -33,10 +33,20 @@ void Spell::NetworkUpdate(string cmd, std::vector<std::string>& args)
 	if (cmd == "SPELL_START") {
 		Active = true;
 		Type = args.at(1)=="true";
+
+		
+
 		X = stof(args.at(2));
 		Y = stof(args.at(3));
 		vX = stof(args.at(4));
 		vY = stof(args.at(5));
+
+		//simulate netowrk delay in seconds--- could be improved via getting the network ping time
+		double estimatedDelay = 0.4;
+		X += vX * estimatedDelay;
+		Y += vY * estimatedDelay;
+
+		particleSystem->Reset();
 	}
 	else if(cmd=="SPELL_FINISH")
 	{
@@ -49,7 +59,8 @@ void Spell::NetworkUpdate(string cmd, std::vector<std::string>& args)
 
 void Spell::Render(SDL_Renderer* renderer)
 {
-	particleSystem->Render(renderer);
+	
+	particleSystem->Render(renderer,Type?FirePraticleColour:IcePraticleColour);
 	if (Active) {		
 		RenderPosition->x = X - Camera::x;
 		RenderPosition->y = Y - Camera::y;

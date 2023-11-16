@@ -13,6 +13,7 @@ public:
 	Player(int _ID, int _X, int _Y);
 	~Player();
 	
+	void PositionPrediction(int X, int Y);
 	void NetworkUpdate(std::string cmd,std::vector<std::string>& args);
 	void Render(SDL_Renderer* renderer);
 
@@ -30,6 +31,12 @@ public:
 private:
 	int X, Y;
 	float angle;
+
+	double LastMessageTime;
+	int LastX, LastY;
+	int PredictedX, PredictedY;
+
 	SDL_Rect* RenderPosition;
+	float lerpClamped(float a, float b, float f);
 };
 

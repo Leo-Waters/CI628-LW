@@ -24,6 +24,12 @@ public:
 private:
 	bool IsFireType;
 	int X, Y;
+
+	double LastMessageTime;
+	int LastX, LastY;
+	int PredictedX, PredictedY;
+
 	SDL_Rect* RenderPosition;
+	float lerpClamped(float a, float b, float f);
 };
 

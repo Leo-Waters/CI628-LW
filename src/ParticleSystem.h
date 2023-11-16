@@ -22,8 +22,9 @@ class ParticleSystem
 public:
 	ParticleSystem(int _ParticleAmount,float _spawnRate,float _lifeTime);
 	~ParticleSystem();
+	void Reset();
 	void Update(float tpf, int x, int y,int vX, int vY, bool CreateNewParticles);
-	void Render(SDL_Renderer* renderer);
+	void Render(SDL_Renderer* renderer, SDL_Colour color);
 private:
 	int RandomRange(int min, int max);
 	Particle* Particles;

@@ -15,6 +15,15 @@ ParticleSystem::~ParticleSystem()
 	delete[]Particles;
 }
 
+void ParticleSystem::Reset()
+{
+
+	for (size_t i = 0; i < ParticleAmount; i++)
+	{
+		Particles[i].lifetime = -1;
+	}
+}
+
 void ParticleSystem::Update(float tpf, int x, int y,int vX,int vY,bool CreateNewParticles)
 {
 	if (CreateNewParticles) {
@@ -31,20 +40,20 @@ void ParticleSystem::Update(float tpf, int x, int y,int vX,int vY,bool CreateNew
 		//spawn new particles
 		else if (CreateNewParticles && TimeTillSpawn < 0.0f) {
 				TimeTillSpawn += spawnRate;
-				Particles[i].Init(lifeTime, RandomRange(x - 5, x + 5), RandomRange(y - 5, y + 5),RandomRange(-10,10), RandomRange(-10, 10), RandomRange(1, 4), RandomRange(1, 4));
+				Particles[i].Init(lifeTime, RandomRange(x - 2, x + 2), RandomRange(y - 2, y + 2),RandomRange(-2,2), RandomRange(-2, 2), RandomRange(-1, 1), RandomRange(-1, 1));
 			}
 
 	}
 }
 
-void ParticleSystem::Render(SDL_Renderer* renderer)
+void ParticleSystem::Render(SDL_Renderer* renderer,SDL_Colour color)
 {
 
 	for (size_t i = 0; i < ParticleAmount; i++)
 	{
 		if (Particles[i].lifetime > 0.0f) {
 			
-			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+			SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 			
 			SDL_RenderDrawPoint(renderer, Particles[i].x - Camera::x, Particles[i].y - Camera::y);
 		}

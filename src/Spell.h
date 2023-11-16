@@ -25,5 +25,7 @@ private:
 	float X, Y;
 	float vX, vY;
 	SDL_Rect* RenderPosition;
+	SDL_Colour IcePraticleColour{ 0, 0, 255, 255};
+	SDL_Colour FirePraticleColour{ 255, 0, 0, 255 };
 };
 
