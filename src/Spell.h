@@ -6,6 +6,7 @@
 #include "Macros.h"
 #include "Camera.h"
 #include "ParticleSystem.h"
+#include "AudioManager.h"
 class Spell
 {
 public:

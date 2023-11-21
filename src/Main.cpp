@@ -1,6 +1,7 @@
 #include "SDL_net.h"
 #include "SDL_image.h"
-
+#include "AudioManager.h"
+#include "SDL_mixer.h"
 #include "MyGame.h"
 #include "TextureManager.h"
 #include "NetworkCommand.h"
@@ -9,7 +10,7 @@
 
 using namespace std;
 
-const char* IP_NAME = "localhost";
+const char* DefaultIP_NAME = "localhost";
 const Uint16 PORT = 55555;
 
 bool is_running = true;
@@ -216,6 +217,7 @@ int run_game() {
 
     TextureManager::Init("Assets/Textures/", renderer);
 
+    AudioManager::Init("Assets/SoundEffects", "Assets/Music");
     
 
     game->Init(renderer);
@@ -246,35 +248,60 @@ int main(int argc, char** argv) {
     // Initialize TTF
     if (TTF_Init() == -1) {
         printf("TTF_Init: %s\n", TTF_GetError());
-        exit(2);
+        exit(3);
+    }
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2040) < 0)
+    {
+        std::cout << "FAILED TO LOAD MIX AUDIO" << Mix_GetError() << std::endl;
+        exit(4);
     }
 
     if (!(IMG_Init(IMG_INIT_PNG)))
     {
         std::cout << "Img_Init FAILED TO INIT ERROR: " << IMG_GetError() << std::endl;
-        exit(3);
-    }
-
-    
-    IPaddress ip;
-
-    // Resolve host (ip name + port) into an IPaddress type
-    if (SDLNet_ResolveHost(&ip, IP_NAME, PORT) == -1) {
-        printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
-        exit(4);
-    }
-
-    // Open the connection to the server
-    TCPsocket socket = SDLNet_TCP_Open(&ip);
-
-    if (!socket) {
-        printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
         exit(5);
     }
+    TCPsocket socket;
+    bool NotConnected = true;
+    while (NotConnected)
+    {
+        IPaddress ip;
+        std::cout << "\n\n\n\nEnter IP Adress or press enter to connect to local machine!" << std::endl;
 
-    SDL_CreateThread(on_receive, "ConnectionReceiveThread", (void*)socket);
-    SDL_CreateThread(on_send, "ConnectionSendThread", (void*)socket);
+        std::string input("");
+        std::getline(std::cin, input);
+        std::string IPAdress;
+        if (input.empty()) {
+            IPAdress = DefaultIP_NAME;
+        }
+        else {
+            IPAdress = input;
+        }
 
+        // Resolve host (ip name + port) into an IPaddress type
+        if (SDLNet_ResolveHost(&ip, IPAdress.c_str(), PORT) == -1) {
+            printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
+            std::cout << "Failed to connect to provided ip address of "<< IPAdress << std::endl;
+            continue;
+            //exit(4);
+        }
+
+        // Open the connection to the server
+        socket = SDLNet_TCP_Open(&ip);
+
+        if (!socket) {
+            printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
+            std::cout << "Failed to connect to provided ip address of " << IPAdress << std::endl;
+            continue;
+            //exit(5);
+        }
+        else
+        {
+            SDL_CreateThread(on_receive, "ConnectionReceiveThread", (void*)socket);
+            SDL_CreateThread(on_send, "ConnectionSendThread", (void*)socket);
+            NotConnected = false;
+        }
+    }
     run_game();
 
     game->Dispose();
@@ -282,7 +309,7 @@ int main(int argc, char** argv) {
 
     //clean up textures
     TextureManager::Dispose();
-
+    AudioManager::Dispose();
     // Close connection to the server
     SDLNet_TCP_Close(socket);
 

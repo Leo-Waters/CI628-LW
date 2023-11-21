@@ -115,6 +115,8 @@ void MyGame::Init(SDL_Renderer* renderer)
 
     send("GAMESTATE|");//request a game state update
 
+    AudioManager::PlayMusic("backgroundmusic.wav");
+
 }
 
 void MyGame::UpdateScoresMenu(SDL_Renderer* renderer)
@@ -251,7 +253,7 @@ void MyGame::send(std::string message) {
 
 void MyGame::input(SDL_Event& event) {
 
-    if (Players[LocalPlayerID]->IsDead()) {
+    if (Players[LocalPlayerID]->IsDead()|| LocalPlayerID==-1) {
         switch (event.key.keysym.sym) {
         case SDLK_SPACE:
             if (event.type == SDL_KEYDOWN) {

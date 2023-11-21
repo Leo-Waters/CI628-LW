@@ -21,11 +21,11 @@ void Player::PositionPrediction(int newX, int newY)
 	LastY = Y;
 
 	//to far position needs to  sync
-	if (abs(LastX - newX) > 200) {
+	if (abs(LastX - newX) > 100) {
 		LastX = newX;
 
 	}
-	if (abs(LastY - newY) > 200) {
+	if (abs(LastY - newY) > 100) {
 		LastY = newY;
 	}
 

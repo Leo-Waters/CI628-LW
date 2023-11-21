@@ -11,7 +11,7 @@
 #include "Spell.h"
 #include "Enemy.h"
 #include "Level.h"
-
+#include "AudioManager.h"
 #include "GUI.h"
 class MyGame {
 

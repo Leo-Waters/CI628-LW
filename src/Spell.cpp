@@ -33,7 +33,7 @@ void Spell::NetworkUpdate(string cmd, std::vector<std::string>& args)
 	if (cmd == "SPELL_START") {
 		Active = true;
 		Type = args.at(1)=="true";
-
+		AudioManager::PlaySoundEffect("fire.wav", 20);
 		
 
 		X = stof(args.at(2));
