@@ -1,7 +1,7 @@
 # CI628- Dungen crawler client by leo waters
 client for dungen crawler.
 
-server code base stated as simple pong client by almas https://github.com/AlmasB/CI628-PongClient
+code base stated as simple pong client by almas https://github.com/AlmasB/CI628-PongClient
 ### Build
 
 The project is configured to be developed on Windows, so it only includes Windows-specific SDL versions.
