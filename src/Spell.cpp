@@ -17,7 +17,6 @@ Spell::~Spell()
 }
 
 
-
 void Spell::Update(float tpf)
 {
 	if (Active) {
@@ -27,7 +26,6 @@ void Spell::Update(float tpf)
 	}
 	particleSystem->Update(tpf, X+10, Y+10, vX, vY, Active);
 }
-
 void Spell::NetworkUpdate(string cmd, std::vector<std::string>& args)
 {
 	if (cmd == "SPELL_START") {
@@ -56,7 +54,6 @@ void Spell::NetworkUpdate(string cmd, std::vector<std::string>& args)
 	//DEBUG("Recived PLAYER"+ args.at(0)+"   X: " + args.at(1) + " Y: " + args.at(2) + " State: " + args.at(3));
 
 }
-
 void Spell::Render(SDL_Renderer* renderer)
 {
 	

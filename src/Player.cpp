@@ -84,22 +84,12 @@ void Player::Render(SDL_Renderer* renderer)
 
 		double time = (SDL_GetTicks() - LastMessageTime) / 1000;
 
-		//DEBUG("TIME" << (time));
-
-		//DEBUG("Last" << LastX <<"Current"<< X << "Pred" << PredictedX);
-		//DEBUG("Last" << LastY << "Current" << Y << "Pred" << PredictedY);
 		X = lerpClamped(LastX, PredictedX, time);
 		Y = lerpClamped(LastY, PredictedY, time);
 		RenderPosition->x = X - Camera::x;
 		RenderPosition->y = Y - Camera::y;
 
 		SDL_RenderCopyEx(renderer, PlayerTexture, NULL, RenderPosition, angle, NULL, SDL_FLIP_NONE);
-
-
-
-
-
-
 
 	}
 	
